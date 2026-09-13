@@ -211,7 +211,7 @@ function ColorSwatch({
 export default function StyleGuidePage() {
   return (
     <div className="min-h-screen">
-      <div className="border-b border-border bg-muted/40 px-4 py-3 md:px-8">
+      {/* <div className="border-b border-border bg-muted/40 px-4 py-3 md:px-8">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
           <div>
             <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
@@ -223,7 +223,7 @@ export default function StyleGuidePage() {
           </div>
           <ThemeToggle />
         </div>
-      </div>
+      </div> */}
 
       <AppHeader />
 

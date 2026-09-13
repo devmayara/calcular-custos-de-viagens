@@ -39,7 +39,9 @@ export default function StyleGuideLayout({
                         href={item.href}
                         className={cn(
                           "block rounded-md px-3 py-2 text-sm transition-colors",
-                          pathname === item.href
+                          pathname === item.href ||
+                            (item.href !== "/style-guide" &&
+                              pathname.startsWith(item.href))
                             ? "bg-primary text-primary-foreground"
                             : "text-foreground hover:bg-muted"
                         )}
@@ -49,11 +51,7 @@ export default function StyleGuideLayout({
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p className="px-3 text-xs text-muted-foreground">
-                  Em breve (Prompt 2)
-                </p>
-              )}
+              ) : null}
             </div>
           ))}
         </nav>

@@ -16,7 +16,18 @@ export const navigation: NavSection[] = [
   {
     title: "Components",
     items: [
-      // Componentes individuais serão adicionados pelo Prompt 2
+      {
+        name: "CalculatorForm",
+        href: "/style-guide/components/calculator-form",
+      },
+      {
+        name: "CalculationResultCard",
+        href: "/style-guide/components/calculation-result-card",
+      },
+      {
+        name: "HistoryTable",
+        href: "/style-guide/components/history-table",
+      },
     ],
   },
 ];
