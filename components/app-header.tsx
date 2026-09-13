@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calculator, History } from "lucide-react";
+import { BookOpen, Calculator, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { name: "Calculadora", href: "/", icon: Calculator },
+  { name: "Calcular", href: "/", icon: Calculator },
   { name: "Histórico de Viagens", href: "/historico", icon: History },
 ] as const;
 
@@ -58,6 +58,17 @@ export function AppHeader() {
               </Button>
             );
           })}
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-10 min-h-12 gap-2 px-3 sm:min-h-10"
+          >
+            <Link href="/style-guide" aria-label="Abrir Style Guide">
+              <BookOpen className="size-4" aria-hidden />
+              <span className="hidden md:inline">Style Guide</span>
+            </Link>
+          </Button>
           <ThemeToggle />
         </nav>
       </div>

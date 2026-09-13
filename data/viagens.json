@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "b8fd7a6b-946d-400b-9a96-386889cbf408",
+    "destino": "Praia Grande",
+    "distanciaKm": 320,
+    "precoCombustivel": 5.89,
+    "consumoCarro": 12.5,
+    "quantidadePassageiros": 2,
+    "litrosTotais": 25.6,
+    "custoTotal": 150.78,
+    "custoPorKm": 0.47,
+    "custoPorPessoa": 75.39,
+    "sessionId": "test-page-builder-1789333187",
+    "createdAt": "2026-09-13T20:59:48.133Z"
+  },
+  {
+    "id": "f4514f93-c8ca-43a4-b643-d38082fcaa53",
+    "distanciaKm": 130,
+    "precoCombustivel": 6.9,
+    "consumoCarro": 13,
+    "quantidadePassageiros": 2,
+    "litrosTotais": 10,
+    "custoTotal": 69,
+    "custoPorKm": 0.53,
+    "custoPorPessoa": 34.5,
+    "sessionId": "57609b2d-5c31-4d68-8d07-b1b39055fe81",
+    "createdAt": "2026-09-13T21:05:17.197Z"
+  }
+]

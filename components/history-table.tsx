@@ -48,7 +48,7 @@ export function HistoryTable({
         <div className="space-y-1">
           <CardTitle>Histórico de viagens</CardTitle>
           <CardDescription>
-            Últimos cálculos salvos, do mais recente ao mais antigo.
+            Do mais recente ao mais antigo.
           </CardDescription>
         </div>
         {!isEmpty && onClearHistory ? (
