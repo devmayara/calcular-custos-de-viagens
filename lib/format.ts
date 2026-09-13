@@ -19,7 +19,6 @@ export function formatCurrency(value: number): string {
 export function formatNumber(value: number, fractionDigits?: number): string {
   if (fractionDigits !== undefined) {
     return new Intl.NumberFormat("pt-BR", {
-      minimumFractionDigits: fractionDigits,
       maximumFractionDigits: fractionDigits,
     }).format(value);
   }

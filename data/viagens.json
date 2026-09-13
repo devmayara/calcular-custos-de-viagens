@@ -25,5 +25,18 @@
     "custoPorPessoa": 34.5,
     "sessionId": "57609b2d-5c31-4d68-8d07-b1b39055fe81",
     "createdAt": "2026-09-13T21:05:17.197Z"
+  },
+  {
+    "id": "3f9acb08-2f10-4ebf-b4cf-0924ff0c2737",
+    "distanciaKm": 130,
+    "precoCombustivel": 6.9,
+    "consumoCarro": 13,
+    "quantidadePassageiros": 2,
+    "litrosTotais": 10,
+    "custoTotal": 69,
+    "custoPorKm": 0.53,
+    "custoPorPessoa": 34.5,
+    "sessionId": "57609b2d-5c31-4d68-8d07-b1b39055fe81",
+    "createdAt": "2026-09-13T21:08:37.371Z"
   }
 ]

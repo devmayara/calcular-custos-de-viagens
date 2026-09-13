@@ -40,7 +40,7 @@ export function CalculationResultCard({
     },
     {
       label: "Litros totais",
-      value: `${formatNumber(result.litrosTotais, 3)} L`,
+      value: `${formatNumber(result.litrosTotais)} L`,
       hint: "combustível estimado",
     },
   ] as const;
