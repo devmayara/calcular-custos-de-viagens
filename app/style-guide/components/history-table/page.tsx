@@ -84,13 +84,13 @@ export default function HistoryTableShowcasePage() {
       <div className="mx-auto max-w-5xl space-y-12 px-4 py-10 md:px-8">
         <ShowcaseHeader
           title="HistoryTable"
-          description="Tabela interativa do histórico de viagens com colunas organizadas, seleção de linha e empty state."
+          description="Tabela interativa do histórico de viagens com colunas organizadas, ação de ver detalhes em drawer, seleção de linha e empty state."
         />
 
         <ShowcaseSection
           id="demo"
           title="Demo interativa"
-          description="Clique em uma linha para selecionar. Use Limpar para forçar o empty state."
+          description="Use o ícone de olho para abrir os detalhes no drawer. Clique em uma linha para selecionar. Use Limpar para forçar o empty state."
         >
           <HistoryTable
             items={items}
@@ -192,6 +192,17 @@ export default function HistoryTableShowcasePage() {
               <p>
                 Valores numéricos e datas usam tipografia mono para leitura
                 alinhada em dashboards.
+              </p>
+              <p>
+                O botão de ações (ícone de olho) usa{" "}
+                <code className="font-mono text-foreground">aria-label</code>{" "}
+                descritivo e{" "}
+                <code className="font-mono text-foreground">stopPropagation</code>{" "}
+                para não conflitar com a seleção de linha.
+              </p>
+              <p>
+                O drawer de detalhes pode ser fechado pelo ícone X, pelo botão
+                Fechar, pelo overlay ou por gesto de arrastar para baixo.
               </p>
             </CardContent>
           </Card>

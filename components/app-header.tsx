@@ -17,60 +17,62 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-foreground transition-opacity hover:opacity-80"
+          className="flex min-w-0 items-center gap-2 text-foreground transition-opacity hover:opacity-80"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Calculator className="size-4" aria-hidden />
           </span>
-          <span className="font-heading text-sm font-semibold tracking-tight sm:text-base">
+          <span className="font-heading truncate text-sm font-semibold tracking-tight sm:text-base">
             Calcula Custo
           </span>
         </Link>
 
-        <nav className="flex items-center gap-2" aria-label="Navegação principal">
-          {navItems.map(({ name, href, icon: Icon }) => {
-            const isActive =
-              href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(href);
+        <div className="flex items-center gap-2">
+          <nav
+            className="hidden items-center gap-2 md:flex"
+            aria-label="Navegação principal"
+          >
+            {navItems.map(({ name, href, icon: Icon }) => {
+              const isActive =
+                href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(href);
 
-            return (
-              <Button
-                key={href}
-                asChild
-                variant={isActive ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "h-10 min-h-12 gap-2 px-3 sm:min-h-10",
-                  !isActive && "bg-transparent"
-                )}
-              >
-                <Link href={href}>
-                  <Icon className="size-4" aria-hidden />
-                  <span className="hidden sm:inline">{name}</span>
-                  <span className="sm:hidden">
-                    {href === "/" ? "Calcular" : "Histórico"}
-                  </span>
-                </Link>
-              </Button>
-            );
-          })}
+              return (
+                <Button
+                  key={href}
+                  asChild
+                  variant={isActive ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "h-10 min-h-10 gap-2 px-3",
+                    !isActive && "bg-transparent"
+                  )}
+                >
+                  <Link href={href}>
+                    <Icon className="size-4" aria-hidden />
+                    {name}
+                  </Link>
+                </Button>
+              );
+            })}
+          </nav>
+
           <Button
             asChild
             variant="ghost"
-            size="sm"
-            className="h-10 min-h-12 gap-2 px-3 sm:min-h-10"
+            size="icon"
+            className="size-10 min-h-12 min-w-12 md:min-h-10 md:min-w-10"
           >
             <Link href="/style-guide" aria-label="Abrir Style Guide">
               <BookOpen className="size-4" aria-hidden />
-              <span className="hidden md:inline">Style Guide</span>
             </Link>
           </Button>
           <ThemeToggle />
-        </nav>
+        </div>
       </div>
     </header>
   );

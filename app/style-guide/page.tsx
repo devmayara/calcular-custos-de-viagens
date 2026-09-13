@@ -1,4 +1,5 @@
 import { AlertCircle, Calculator, CheckCircle2, Info, Pencil } from "lucide-react";
+import { AppBottomNav } from "@/components/app-bottom-nav";
 import { AppHeader } from "@/components/app-header";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -225,7 +226,10 @@ export default function StyleGuidePage() {
         </div>
       </div> */}
 
-      <AppHeader />
+      <div className="relative pb-20 md:pb-0">
+        <AppHeader />
+        <AppBottomNav />
+      </div>
 
       <div className="mx-auto max-w-5xl space-y-12 px-4 py-10 md:px-8">
         <header className="space-y-3">
