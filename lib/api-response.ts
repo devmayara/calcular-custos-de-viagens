@@ -4,9 +4,14 @@ import type { ApiErrorBody } from "@/types/viagem";
 export function jsonError(
   status: number,
   error: string,
-  details?: string[]
+  details?: string[],
+  code?: string
 ): NextResponse<ApiErrorBody> {
-  const body: ApiErrorBody = details?.length ? { error, details } : { error };
+  const body: ApiErrorBody = {
+    error,
+    ...(details?.length ? { details } : {}),
+    ...(code ? { code } : {}),
+  };
   return NextResponse.json(body, { status });
 }
 

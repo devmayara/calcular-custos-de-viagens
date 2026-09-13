@@ -1,4 +1,9 @@
-import type { CalcularCustoInput } from "@/types/viagem";
+import type {
+  CalcularCustoInput,
+  DistanciaFonte,
+  TipoCombustivel,
+  TipoTrajeto,
+} from "@/types/viagem";
 
 type ValidationSuccess = {
   ok: true;
@@ -13,6 +18,18 @@ type ValidationFailure = {
 };
 
 export type ValidationResult = ValidationSuccess | ValidationFailure;
+
+const TIPOS_COMBUSTIVEL: TipoCombustivel[] = [
+  "gasolina-comum",
+  "gasolina-aditivada",
+  "etanol",
+  "diesel",
+  "gnv",
+];
+
+const TIPOS_TRAJETO: TipoTrajeto[] = ["ida", "ida-volta"];
+
+const DISTANCIA_FONTES: DistanciaFonte[] = ["manual", "rota"];
 
 function isNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -29,6 +46,10 @@ export function validarCalcularBody(body: unknown): ValidationResult {
 
   const payload = body as Record<string, unknown>;
   const details: string[] = [];
+
+  if (payload.origem !== undefined && typeof payload.origem !== "string") {
+    details.push("origem deve ser uma string");
+  }
 
   if (payload.destino !== undefined && typeof payload.destino !== "string") {
     details.push("destino deve ser uma string");
@@ -73,6 +94,30 @@ export function validarCalcularBody(body: unknown): ValidationResult {
     }
   }
 
+  if (
+    payload.tipoCombustivel !== undefined &&
+    (typeof payload.tipoCombustivel !== "string" ||
+      !TIPOS_COMBUSTIVEL.includes(payload.tipoCombustivel as TipoCombustivel))
+  ) {
+    details.push("tipoCombustivel inválido");
+  }
+
+  if (
+    payload.tipoTrajeto !== undefined &&
+    (typeof payload.tipoTrajeto !== "string" ||
+      !TIPOS_TRAJETO.includes(payload.tipoTrajeto as TipoTrajeto))
+  ) {
+    details.push("tipoTrajeto inválido");
+  }
+
+  if (
+    payload.distanciaFonte !== undefined &&
+    (typeof payload.distanciaFonte !== "string" ||
+      !DISTANCIA_FONTES.includes(payload.distanciaFonte as DistanciaFonte))
+  ) {
+    details.push("distanciaFonte inválida");
+  }
+
   if (details.length > 0) {
     return {
       ok: false,
@@ -85,12 +130,18 @@ export function validarCalcularBody(body: unknown): ValidationResult {
   return {
     ok: true,
     data: {
+      origem: payload.origem as string | undefined,
       destino: payload.destino as string | undefined,
       distanciaKm: payload.distanciaKm as number,
       precoCombustivel: payload.precoCombustivel as number,
       consumoCarro: payload.consumoCarro as number,
       quantidadePassageiros:
         (payload.quantidadePassageiros as number | undefined) ?? 1,
+      tipoCombustivel:
+        (payload.tipoCombustivel as TipoCombustivel | undefined) ?? "gasolina-comum",
+      tipoTrajeto: (payload.tipoTrajeto as TipoTrajeto | undefined) ?? "ida",
+      distanciaFonte:
+        (payload.distanciaFonte as DistanciaFonte | undefined) ?? "manual",
     },
   };
 }

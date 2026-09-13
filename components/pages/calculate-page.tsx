@@ -57,9 +57,12 @@ export function CalculatePage() {
       {result ? (
         <CalculationResultCard
           result={result}
+          origem={result.origem}
           destino={result.destino}
           distanciaKm={result.distanciaKm}
           quantidadePassageiros={result.quantidadePassageiros}
+          tipoCombustivel={result.tipoCombustivel}
+          tipoTrajeto={result.tipoTrajeto}
         />
       ) : null}
     </div>

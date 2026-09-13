@@ -37,9 +37,12 @@ export function ResultPreview() {
   return (
     <CalculationResultCard
       result={result}
+      origem="São Paulo"
       destino="Praia Grande"
       distanciaKm={320}
       quantidadePassageiros={2}
+      tipoCombustivel="gasolina"
+      tipoTrajeto="ida"
     />
   )
 }`;
@@ -69,9 +72,12 @@ export default function CalculationResultCardShowcasePage() {
         >
           <CalculationResultCard
             result={sampleResult}
+            origem="São Paulo"
             destino="Praia Grande"
             distanciaKm={320}
             quantidadePassageiros={2}
+            tipoCombustivel="gasolina"
+            tipoTrajeto="ida-volta"
           />
         </ShowcaseSection>
 
@@ -83,9 +89,12 @@ export default function CalculationResultCardShowcasePage() {
           <div className="grid gap-4 lg:grid-cols-2">
             <CalculationResultCard
               result={sampleResult}
+              origem="São Paulo"
               destino="Praia Grande"
               distanciaKm={320}
               quantidadePassageiros={2}
+              tipoCombustivel="etanol"
+              tipoTrajeto="ida"
             />
             <CalculationResultCard
               result={soloResult}

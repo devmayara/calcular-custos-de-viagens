@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Calculator } from "lucide-react";
+import { Calculator, Loader2, LocateFixed } from "lucide-react";
+import { PlaceAutocompleteField } from "@/components/place-autocomplete-field";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,19 +14,30 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { fetchReverseGeocode, fetchRotaDistancia } from "@/lib/maps-client";
 import { cn } from "@/lib/utils";
-import type { CalcularCustoInput } from "@/types/viagem";
+import type {
+  CalcularCustoInput,
+  DistanciaFonte,
+  LugarRef,
+  TipoCombustivel,
+  TipoTrajeto,
+} from "@/types/viagem";
 
 export type CalculatorFormValues = {
-  destino: string;
+  origemInput: string;
+  destinoInput: string;
   distanciaKm: string;
   precoCombustivel: string;
   consumoCarro: string;
   quantidadePassageiros: string;
+  tipoCombustivel: TipoCombustivel;
+  tipoTrajeto: TipoTrajeto;
 };
 
 export type CalculatorFormErrors = Partial<
-  Record<keyof CalculatorFormValues, string>
+  Record<keyof CalculatorFormValues | "origem" | "destino", string>
 >;
 
 export type CalculatorFormProps = {
@@ -35,12 +47,23 @@ export type CalculatorFormProps = {
   className?: string;
 };
 
+const FUEL_OPTIONS: { value: TipoCombustivel; label: string }[] = [
+  { value: "gasolina-comum", label: "Gasolina Comum" },
+  { value: "gasolina-aditivada", label: "Gasolina Aditivada" },
+  { value: "etanol", label: "Etanol" },
+  { value: "diesel", label: "Diesel" },
+  { value: "gnv", label: "GNV" },
+];
+
 const initialValues: CalculatorFormValues = {
-  destino: "",
+  origemInput: "",
+  destinoInput: "",
   distanciaKm: "",
   precoCombustivel: "",
   consumoCarro: "",
   quantidadePassageiros: "1",
+  tipoCombustivel: "gasolina-comum",
+  tipoTrajeto: "ida",
 };
 
 function parsePositiveNumber(raw: string): number | null {
@@ -50,8 +73,52 @@ function parsePositiveNumber(raw: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+function formatKm(value: number): string {
+  return Number.isInteger(value) ? String(value) : String(Math.round(value * 10) / 10);
+}
+
+function distanciaEfetiva(idaKm: number, tipoTrajeto: TipoTrajeto): number {
+  return tipoTrajeto === "ida-volta" ? idaKm * 2 : idaKm;
+}
+
+function lugarParaRota(lugar: LugarRef | null, fallbackLabel: string) {
+  if (!lugar) {
+    const address = fallbackLabel.trim();
+    return address ? { address } : null;
+  }
+
+  const hasCoords = lugar.lat != null && lugar.lng != null;
+
+  // Coordenadas têm prioridade — OSRM/Nominatim dependem delas
+  if (hasCoords) {
+    return {
+      lat: lugar.lat as number,
+      lng: lugar.lng as number,
+      ...(lugar.placeId ? { placeId: lugar.placeId } : {}),
+    };
+  }
+
+  // placeId do Google (sem prefixo osm:)
+  if (lugar.placeId && !lugar.placeId.startsWith("osm:")) {
+    return { placeId: lugar.placeId };
+  }
+
+  const address = (lugar.label || fallbackLabel).trim();
+  return address ? { address } : null;
+}
+
+function lugarProntoParaRota(lugar: LugarRef | null): boolean {
+  if (!lugar) return false;
+  if (lugar.lat != null && lugar.lng != null) return true;
+  if (lugar.placeId && !lugar.placeId.startsWith("osm:")) return true;
+  return false;
+}
+
 export function validateCalculatorForm(
-  values: CalculatorFormValues
+  values: CalculatorFormValues,
+  origem: LugarRef | null,
+  destino: LugarRef | null,
+  distanciaFonte: DistanciaFonte
 ): { ok: true; data: CalcularCustoInput } | { ok: false; errors: CalculatorFormErrors } {
   const errors: CalculatorFormErrors = {};
 
@@ -93,16 +160,23 @@ export function validateCalculatorForm(
     return { ok: false, errors };
   }
 
-  const destino = values.destino.trim();
+  const origemLabel = (origem?.label || values.origemInput).trim();
+  const destinoLabel = (destino?.label || values.destinoInput).trim();
 
   return {
     ok: true,
     data: {
-      ...(destino ? { destino } : {}),
+      ...(origemLabel ? { origem: origemLabel } : {}),
+      ...(destinoLabel ? { destino: destinoLabel } : {}),
+      ...(origem ? { origemPlace: origem } : {}),
+      ...(destino ? { destinoPlace: destino } : {}),
       distanciaKm: distanciaKm as number,
       precoCombustivel: precoCombustivel as number,
       consumoCarro: consumoCarro as number,
       quantidadePassageiros: quantidadePassageiros as number,
+      tipoCombustivel: values.tipoCombustivel,
+      tipoTrajeto: values.tipoTrajeto,
+      distanciaFonte,
     },
   };
 }
@@ -118,6 +192,15 @@ export function CalculatorForm({
     ...defaultValues,
   });
   const [errors, setErrors] = React.useState<CalculatorFormErrors>({});
+  const [origem, setOrigem] = React.useState<LugarRef | null>(null);
+  const [destino, setDestino] = React.useState<LugarRef | null>(null);
+  const [distanciaIdaKm, setDistanciaIdaKm] = React.useState<number | null>(null);
+  const [distanciaFonte, setDistanciaFonte] =
+    React.useState<DistanciaFonte>("manual");
+  const [rotaLoading, setRotaLoading] = React.useState(false);
+  const [rotaMessage, setRotaMessage] = React.useState<string | null>(null);
+  const [geoLoading, setGeoLoading] = React.useState(false);
+  const [geoError, setGeoError] = React.useState<string | null>(null);
 
   function updateField<K extends keyof CalculatorFormValues>(
     key: K,
@@ -133,9 +216,152 @@ export function CalculatorForm({
     }
   }
 
+  function applyDistanciaFromIda(idaKm: number, tipoTrajeto: TipoTrajeto) {
+    setDistanciaIdaKm(idaKm);
+    updateField("distanciaKm", formatKm(distanciaEfetiva(idaKm, tipoTrajeto)));
+  }
+
+  function handleTipoTrajetoChange(next: TipoTrajeto) {
+    updateField("tipoTrajeto", next);
+    if (distanciaIdaKm != null) {
+      updateField("distanciaKm", formatKm(distanciaEfetiva(distanciaIdaKm, next)));
+      return;
+    }
+    const atual = parsePositiveNumber(values.distanciaKm);
+    if (atual == null) return;
+    if (values.tipoTrajeto === "ida" && next === "ida-volta") {
+      setDistanciaIdaKm(atual);
+      updateField("distanciaKm", formatKm(atual * 2));
+    } else if (values.tipoTrajeto === "ida-volta" && next === "ida") {
+      const ida = atual / 2;
+      setDistanciaIdaKm(ida);
+      updateField("distanciaKm", formatKm(ida));
+    }
+  }
+
+  function handleDistanciaManualChange(raw: string) {
+    updateField("distanciaKm", raw);
+    setDistanciaFonte("manual");
+    const parsed = parsePositiveNumber(raw);
+    if (parsed == null) {
+      setDistanciaIdaKm(null);
+      return;
+    }
+    setDistanciaIdaKm(
+      values.tipoTrajeto === "ida-volta" ? parsed / 2 : parsed
+    );
+  }
+
+  React.useEffect(() => {
+    if (!lugarProntoParaRota(origem) || !lugarProntoParaRota(destino)) {
+      return;
+    }
+    if (!origem || !destino) return;
+
+    const origemPoint = lugarParaRota(origem, origem.label);
+    const destinoPoint = lugarParaRota(destino, destino.label);
+    if (!origemPoint || !destinoPoint) return;
+
+    let cancelled = false;
+    setRotaLoading(true);
+    setRotaMessage(null);
+
+    void (async () => {
+      try {
+        const rota = await fetchRotaDistancia({
+          origem: origemPoint,
+          destino: destinoPoint,
+        });
+        if (cancelled) return;
+        setDistanciaFonte("rota");
+        applyDistanciaFromIda(rota.distanciaKm, values.tipoTrajeto);
+        const duracaoMin =
+          rota.duracaoSegundos != null
+            ? Math.round(rota.duracaoSegundos / 60)
+            : null;
+        setRotaMessage(
+          duracaoMin != null
+            ? `Rota: ${formatKm(rota.distanciaKm)} km de ida (~${duracaoMin} min)`
+            : `Rota: ${formatKm(rota.distanciaKm)} km de ida`
+        );
+      } catch (err) {
+        if (cancelled) return;
+        setRotaMessage(
+          err instanceof Error
+            ? err.message
+            : "Não foi possível calcular a rota. Informe o km manualmente."
+        );
+      } finally {
+        if (!cancelled) setRotaLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só reagimos a mudança de lugares
+  }, [origem, destino]);
+
+  function handleUseMyLocation() {
+    setGeoError(null);
+
+    if (!navigator.geolocation) {
+      setGeoError("Geolocalização não é suportada neste navegador.");
+      return;
+    }
+
+    setGeoLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        void (async () => {
+          try {
+            const resolved = await fetchReverseGeocode(lat, lng);
+            const lugar: LugarRef = {
+              label: resolved.label,
+              lat: resolved.lat,
+              lng: resolved.lng,
+            };
+            setOrigem(lugar);
+            updateField("origemInput", lugar.label);
+          } catch {
+            const lugar: LugarRef = {
+              label: "Minha localização",
+              lat,
+              lng,
+            };
+            setOrigem(lugar);
+            updateField("origemInput", lugar.label);
+            setGeoError(
+              "Localização obtida, mas o endereço não pôde ser resolvido."
+            );
+          } finally {
+            setGeoLoading(false);
+          }
+        })();
+      },
+      (err) => {
+        setGeoLoading(false);
+        setGeoError(
+          err.code === err.PERMISSION_DENIED
+            ? "Permissão de localização negada. Digite a origem manualmente."
+            : "Não foi possível obter sua localização."
+        );
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = validateCalculatorForm(values);
+    const result = validateCalculatorForm(
+      values,
+      origem,
+      destino,
+      distanciaFonte
+    );
 
     if (!result.ok) {
       setErrors(result.errors);
@@ -151,7 +377,8 @@ export function CalculatorForm({
       <CardHeader>
         <CardTitle>Calcular custo da viagem</CardTitle>
         <CardDescription>
-          Informe km, preço do litro, consumo e passageiros para obter o custo.
+          Origem, destino e combustível — a distância pode ser calculada pela
+          rota.
         </CardDescription>
       </CardHeader>
 
@@ -162,44 +389,137 @@ export function CalculatorForm({
       >
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="destino">Destino (opcional)</Label>
-            <Input
-              id="destino"
-              name="destino"
-              placeholder="Ex.: Praia Grande"
-              value={values.destino}
-              onChange={(e) => updateField("destino", e.target.value)}
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <Label htmlFor="origem">Origem</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-10"
+                disabled={isSubmitting || geoLoading}
+                onClick={handleUseMyLocation}
+              >
+                {geoLoading ? (
+                  <Loader2 data-icon="inline-start" className="animate-spin" />
+                ) : (
+                  <LocateFixed data-icon="inline-start" />
+                )}
+                Usar minha localização
+              </Button>
+            </div>
+            <PlaceAutocompleteField
+              id="origem"
+              name="origem"
+              placeholder="De onde você sai?"
+              value={origem}
+              inputValue={values.origemInput}
               disabled={isSubmitting}
-              aria-invalid={Boolean(errors.destino)}
-              aria-describedby={errors.destino ? "destino-error" : undefined}
+              error={errors.origem}
+              onInputChange={(text) => {
+                updateField("origemInput", text);
+                setOrigem((prev) =>
+                  prev && prev.label === text
+                    ? prev
+                    : text.trim()
+                      ? { label: text.trim() }
+                      : null
+                );
+              }}
+              onSelect={(lugar) => {
+                setOrigem(lugar);
+                updateField("origemInput", lugar.label);
+              }}
             />
-            {errors.destino ? (
-              <p id="destino-error" className="text-xs text-destructive" role="alert">
-                {errors.destino}
+            {geoError ? (
+              <p className="text-xs text-destructive" role="alert">
+                {geoError}
               </p>
             ) : null}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="distanciaKm">Distância (Km)</Label>
-            <Input
-              id="distanciaKm"
-              name="distanciaKm"
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="any"
-              placeholder="320"
-              className="min-h-12 font-mono"
-              value={values.distanciaKm}
-              onChange={(e) => updateField("distanciaKm", e.target.value)}
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="destino">Destino</Label>
+            <PlaceAutocompleteField
+              id="destino"
+              name="destino"
+              placeholder="Para onde você vai?"
+              value={destino}
+              inputValue={values.destinoInput}
               disabled={isSubmitting}
-              aria-invalid={Boolean(errors.distanciaKm)}
-              aria-describedby={
-                errors.distanciaKm ? "distanciaKm-error" : undefined
-              }
-              required
+              error={errors.destino}
+              onInputChange={(text) => {
+                updateField("destinoInput", text);
+                setDestino((prev) =>
+                  prev && prev.label === text
+                    ? prev
+                    : text.trim()
+                      ? { label: text.trim() }
+                      : null
+                );
+              }}
+              onSelect={(lugar) => {
+                setDestino(lugar);
+                updateField("destinoInput", lugar.label);
+              }}
             />
+          </div>
+
+          <fieldset className="space-y-2 sm:col-span-2">
+            <Legend className="text-sm font-medium">Tipo de trajeto</Legend>
+            <RadioGroup
+              value={values.tipoTrajeto}
+              onValueChange={(v) => handleTipoTrajetoChange(v as TipoTrajeto)}
+              className="grid gap-2 sm:grid-cols-2"
+              disabled={isSubmitting}
+              aria-label="Tipo de trajeto"
+            >
+              <label
+                htmlFor="trajeto-ida"
+                className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border px-3 has-[[data-state=checked]]:border-primary"
+              >
+                <RadioGroupItem value="ida" id="trajeto-ida" />
+                <span className="text-sm">Ida</span>
+              </label>
+              <label
+                htmlFor="trajeto-ida-volta"
+                className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border px-3 has-[[data-state=checked]]:border-primary"
+              >
+                <RadioGroupItem value="ida-volta" id="trajeto-ida-volta" />
+                <span className="text-sm">Ida e volta</span>
+              </label>
+            </RadioGroup>
+          </fieldset>
+
+          <div className="space-y-2">
+            <Label htmlFor="distanciaKm">
+              Distância ({values.tipoTrajeto === "ida-volta" ? "total" : "ida"}) (Km)
+            </Label>
+            <div className="relative">
+              <Input
+                id="distanciaKm"
+                name="distanciaKm"
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step="any"
+                placeholder="320"
+                className="min-h-12 font-mono"
+                value={values.distanciaKm}
+                onChange={(e) => handleDistanciaManualChange(e.target.value)}
+                disabled={isSubmitting}
+                aria-invalid={Boolean(errors.distanciaKm)}
+                aria-describedby={
+                  errors.distanciaKm ? "distanciaKm-error" : "distanciaKm-hint"
+                }
+                required
+              />
+              {rotaLoading ? (
+                <Loader2
+                  className="absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin text-muted-foreground"
+                  aria-hidden
+                />
+              ) : null}
+            </div>
             {errors.distanciaKm ? (
               <p
                 id="distanciaKm-error"
@@ -208,7 +528,38 @@ export function CalculatorForm({
               >
                 {errors.distanciaKm}
               </p>
-            ) : null}
+            ) : (
+              <p id="distanciaKm-hint" className="text-xs text-muted-foreground">
+                {rotaMessage ??
+                  (distanciaFonte === "rota"
+                    ? "Distância preenchida pela rota (editável)."
+                    : "Preenchida pela rota ou manualmente.")}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tipoCombustivel">Tipo de combustível</Label>
+            <select
+              id="tipoCombustivel"
+              name="tipoCombustivel"
+              className={cn(
+                "h-12 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none transition-colors",
+                "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+                "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30"
+              )}
+              value={values.tipoCombustivel}
+              onChange={(e) =>
+                updateField("tipoCombustivel", e.target.value as TipoCombustivel)
+              }
+              disabled={isSubmitting}
+            >
+              {FUEL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -275,7 +626,7 @@ export function CalculatorForm({
             ) : null}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="quantidadePassageiros">
               Quantidade de passageiros
             </Label>
@@ -287,7 +638,7 @@ export function CalculatorForm({
               min={1}
               step={1}
               placeholder="1"
-              className="min-h-12 font-mono"
+              className="min-h-12 font-mono sm:max-w-xs"
               value={values.quantidadePassageiros}
               onChange={(e) =>
                 updateField("quantidadePassageiros", e.target.value)
@@ -318,7 +669,7 @@ export function CalculatorForm({
             type="submit"
             size="lg"
             className="min-h-12 w-full sm:w-auto"
-            disabled={isSubmitting}
+            disabled={isSubmitting || rotaLoading}
           >
             <Calculator data-icon="inline-start" />
             {isSubmitting ? "Calculando..." : "Calcular Custo"}
@@ -327,4 +678,11 @@ export function CalculatorForm({
       </form>
     </Card>
   );
+}
+
+function Legend({
+  className,
+  ...props
+}: React.ComponentProps<"legend">) {
+  return <legend className={cn(className)} {...props} />;
 }

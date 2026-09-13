@@ -33,6 +33,7 @@ import {
   formatDateTime,
   formatNumber,
 } from "@/lib/format";
+import { labelCombustivel, labelTrajeto } from "@/lib/labels-viagem";
 import { cn } from "@/lib/utils";
 import type { Viagem } from "@/types/viagem";
 
@@ -116,7 +117,8 @@ export function HistoryTable({
               <TableHeader>
                 <TableRow>
                   <TableHead>Data</TableHead>
-                  <TableHead>Destino</TableHead>
+                  <TableHead>Trecho</TableHead>
+                  <TableHead>Combustível</TableHead>
                   <TableHead className="text-right">Distância</TableHead>
                   <TableHead className="text-right">Custo total</TableHead>
                   <TableHead className="text-right">Custo/km</TableHead>
@@ -155,7 +157,23 @@ export function HistoryTable({
                         {formatDateTime(viagem.createdAt)}
                       </TableCell>
                       <TableCell>
-                        {viagem.destino?.trim() || (
+                        {viagem.origem && viagem.destino ? (
+                          <span className="line-clamp-2">
+                            {viagem.origem} → {viagem.destino}
+                          </span>
+                        ) : (
+                          viagem.destino?.trim() || (
+                            <span className="text-muted-foreground">—</span>
+                          )
+                        )}
+                        {labelTrajeto(viagem.tipoTrajeto) ? (
+                          <span className="mt-0.5 block text-xs text-muted-foreground">
+                            {labelTrajeto(viagem.tipoTrajeto)}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>
+                        {labelCombustivel(viagem.tipoCombustivel) ?? (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
@@ -238,6 +256,9 @@ export function HistoryTable({
                   </dt>
                   <dd className="font-mono font-medium">
                     {formatCurrency(detailViagem.precoCombustivel)}/L
+                    {labelCombustivel(detailViagem.tipoCombustivel)
+                      ? ` · ${labelCombustivel(detailViagem.tipoCombustivel)}`
+                      : ""}
                   </dd>
                 </div>
                 <div className="space-y-1 rounded-lg bg-muted/40 p-3">
@@ -250,9 +271,12 @@ export function HistoryTable({
 
               <CalculationResultCard
                 result={detailViagem}
+                origem={detailViagem.origem}
                 destino={detailViagem.destino}
                 distanciaKm={detailViagem.distanciaKm}
                 quantidadePassageiros={detailViagem.quantidadePassageiros}
+                tipoCombustivel={detailViagem.tipoCombustivel}
+                tipoTrajeto={detailViagem.tipoTrajeto}
               />
             </div>
           ) : null}

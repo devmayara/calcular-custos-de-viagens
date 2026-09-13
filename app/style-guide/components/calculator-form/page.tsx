@@ -22,10 +22,13 @@ export function TripCalculator() {
   return (
     <CalculatorForm
       defaultValues={{
+        destinoInput: "Praia Grande",
         distanciaKm: "320",
         precoCombustivel: "5.89",
         consumoCarro: "12.5",
         quantidadePassageiros: "2",
+        tipoTrajeto: "ida",
+        tipoCombustivel: "gasolina",
       }}
       onSubmit={(data) => {
         const result = calcularCustoViagem(data)
@@ -63,7 +66,7 @@ export default function CalculatorFormShowcasePage() {
       <div className="mx-auto max-w-5xl space-y-12 px-4 py-10 md:px-8">
         <ShowcaseHeader
           title="CalculatorForm"
-          description="Formulário modular do MVP com Destino, Distância, Preço, Consumo e Passageiros — validação client-side e CTA Calcular Custo."
+          description="Formulário com origem/destino (autocomplete), ida ou ida e volta, tipo de combustível e distância por rota ou manual."
         />
 
         <ShowcaseSection
@@ -74,7 +77,7 @@ export default function CalculatorFormShowcasePage() {
           <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <CalculatorForm
               defaultValues={{
-                destino: "Praia Grande",
+                destinoInput: "Praia Grande",
                 distanciaKm: "320",
                 precoCombustivel: "5.89",
                 consumoCarro: "12.5",
@@ -113,7 +116,8 @@ export default function CalculatorFormShowcasePage() {
           <div className="grid gap-4 xl:grid-cols-2">
             <CalculatorForm
               defaultValues={{
-                destino: "",
+                origemInput: "",
+                destinoInput: "",
                 distanciaKm: "",
                 precoCombustivel: "",
                 consumoCarro: "",
@@ -122,7 +126,7 @@ export default function CalculatorFormShowcasePage() {
             />
             <CalculatorForm
               defaultValues={{
-                destino: "Campinas",
+                destinoInput: "Campinas",
                 distanciaKm: "180",
                 precoCombustivel: "5.49",
                 consumoCarro: "11",

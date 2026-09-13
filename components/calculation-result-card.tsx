@@ -1,4 +1,4 @@
-import { Fuel, MapPin, Users } from "lucide-react";
+import { ArrowRightLeft, Fuel, MapPin, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -9,24 +9,38 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { labelCombustivel, labelTrajeto } from "@/lib/labels-viagem";
 import { cn } from "@/lib/utils";
-import type { CalculoResultado } from "@/types/viagem";
+import type { CalculoResultado, TipoCombustivel, TipoTrajeto } from "@/types/viagem";
 
 export type CalculationResultCardProps = {
   result: CalculoResultado;
+  origem?: string;
   destino?: string;
   distanciaKm?: number;
   quantidadePassageiros?: number;
+  tipoCombustivel?: TipoCombustivel | string;
+  tipoTrajeto?: TipoTrajeto | string;
   className?: string;
 };
 
 export function CalculationResultCard({
   result,
+  origem,
   destino,
   distanciaKm,
   quantidadePassageiros = 1,
+  tipoCombustivel,
+  tipoTrajeto,
   className,
 }: CalculationResultCardProps) {
+  const combustivelLabel = labelCombustivel(tipoCombustivel);
+  const trajetoLabel = labelTrajeto(tipoTrajeto);
+  const trecho =
+    origem && destino
+      ? `${origem} → ${destino}`
+      : destino || origem || undefined;
+
   const metrics = [
     {
       label: "Custo por Km",
@@ -58,18 +72,33 @@ export function CalculationResultCard({
           <Badge variant="secondary">OK</Badge>
         </div>
 
-        {(destino || distanciaKm !== undefined) && (
+        {(trecho ||
+          distanciaKm !== undefined ||
+          combustivelLabel ||
+          trajetoLabel) && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {destino ? (
+            {trecho ? (
               <Badge variant="outline" className="gap-1 font-normal">
                 <MapPin className="size-3.5" aria-hidden />
-                {destino}
+                {trecho}
               </Badge>
             ) : null}
             {distanciaKm !== undefined ? (
               <Badge variant="outline" className="gap-1 font-mono font-normal">
                 <Fuel className="size-3.5" aria-hidden />
                 {formatNumber(distanciaKm)} km
+              </Badge>
+            ) : null}
+            {trajetoLabel ? (
+              <Badge variant="outline" className="gap-1 font-normal">
+                <ArrowRightLeft className="size-3.5" aria-hidden />
+                {trajetoLabel}
+              </Badge>
+            ) : null}
+            {combustivelLabel ? (
+              <Badge variant="outline" className="gap-1 font-normal">
+                <Fuel className="size-3.5" aria-hidden />
+                {combustivelLabel}
               </Badge>
             ) : null}
             <Badge variant="outline" className="gap-1 font-normal">
