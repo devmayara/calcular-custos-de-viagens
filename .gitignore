@@ -10,6 +10,11 @@
 !.yarn/releases
 !.yarn/versions
 
+.cursor
+.docs
+.opencode
+openspec
+
 # testing
 /coverage
 
