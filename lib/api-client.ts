@@ -1,3 +1,7 @@
+import {
+  listarHistoricoLocal,
+  salvarViagemLocal,
+} from "@/lib/historico-local";
 import { getSessionId } from "@/lib/session";
 import type {
   ApiErrorBody,
@@ -46,19 +50,12 @@ export async function postCalcular(
     throw new Error(await parseError(response));
   }
 
-  return (await response.json()) as Viagem;
+  const viagem = (await response.json()) as Viagem;
+  salvarViagemLocal(viagem);
+  return viagem;
 }
 
-export async function getHistorico(): Promise<HistoricoResponse> {
-  const response = await fetch("/api/historico", {
-    method: "GET",
-    headers: sessionHeaders(),
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response));
-  }
-
-  return (await response.json()) as HistoricoResponse;
+export function getHistorico(): HistoricoResponse {
+  const data = listarHistoricoLocal();
+  return { data, total: data.length };
 }

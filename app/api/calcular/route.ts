@@ -1,6 +1,6 @@
 import { jsonError, jsonOk } from "@/lib/api-response";
 import { validarCalcularBody } from "@/lib/validar-calcular";
-import { registrarViagem } from "@/lib/viagens-store";
+import { criarViagem } from "@/lib/viagens-store";
 
 /**
  * @swagger
@@ -8,10 +8,10 @@ import { registrarViagem } from "@/lib/viagens-store";
  *   post:
  *     tags:
  *       - Viagens
- *     summary: Calcula o custo de uma viagem e salva no histórico
+ *     summary: Calcula o custo de uma viagem
  *     description: |
  *       Calcula litros totais, custo total, custo por km e custo por pessoa.
- *       Persiste o resultado em `data/viagens.json` com `createdAt`.
+ *       A persistência do histórico é feita no cliente (localStorage).
  *       Envie o header `x-session-id` (valor do localStorage no cliente) para
  *       associar o cálculo à sessão do usuário.
  *     parameters:
@@ -35,7 +35,7 @@ import { registrarViagem } from "@/lib/viagens-store";
  *             quantidadePassageiros: 2
  *     responses:
  *       201:
- *         description: Cálculo realizado e viagem registrada
+ *         description: Cálculo realizado
  *         content:
  *           application/json:
  *             schema:
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     const sessionId = request.headers.get("x-session-id")?.trim() || undefined;
-    const viagem = await registrarViagem(validation.data, sessionId);
+    const viagem = criarViagem(validation.data, sessionId);
 
     return jsonOk(viagem, 201);
   } catch (error) {

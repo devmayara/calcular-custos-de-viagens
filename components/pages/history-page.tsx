@@ -15,38 +15,22 @@ export function HistoryPage() {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
 
-    async function loadHistorico() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await getHistorico();
-        if (!cancelled) {
-          setItems(response.data);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setItems([]);
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Não foi possível carregar o histórico."
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
+    try {
+      const response = getHistorico();
+      setItems(response.data);
+    } catch (err) {
+      setItems([]);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível carregar o histórico."
+      );
+    } finally {
+      setIsLoading(false);
     }
-
-    void loadHistorico();
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   return (
