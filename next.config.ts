@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Necessário para swagger-ui-react com bundlers do Next.js
+  transpilePackages: ["swagger-ui-react", "swagger-client"],
 };
 
 export default nextConfig;
