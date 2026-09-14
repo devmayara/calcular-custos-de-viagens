@@ -21,7 +21,7 @@ const sampleHistory: Viagem[] = [
     precoCombustivel: 5.89,
     consumoCarro: 12.5,
     quantidadePassageiros: 2,
-    tipoCombustivel: "gasolina",
+    tipoCombustivel: "gasolina-comum",
     tipoTrajeto: "ida",
     litrosTotais: 25.6,
     custoTotal: 150.78,

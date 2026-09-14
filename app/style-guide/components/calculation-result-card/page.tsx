@@ -41,7 +41,7 @@ export function ResultPreview() {
       destino="Praia Grande"
       distanciaKm={320}
       quantidadePassageiros={2}
-      tipoCombustivel="gasolina"
+      tipoCombustivel="gasolina-comum"
       tipoTrajeto="ida"
     />
   )
@@ -76,7 +76,7 @@ export default function CalculationResultCardShowcasePage() {
             destino="Praia Grande"
             distanciaKm={320}
             quantidadePassageiros={2}
-            tipoCombustivel="gasolina"
+            tipoCombustivel="gasolina-comum"
             tipoTrajeto="ida-volta"
           />
         </ShowcaseSection>

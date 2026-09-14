@@ -28,7 +28,7 @@ export function TripCalculator() {
         consumoCarro: "12.5",
         quantidadePassageiros: "2",
         tipoTrajeto: "ida",
-        tipoCombustivel: "gasolina",
+        tipoCombustivel: "gasolina-comum",
       }}
       onSubmit={(data) => {
         const result = calcularCustoViagem(data)
