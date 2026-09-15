@@ -140,7 +140,7 @@ export function PlaceAutocompleteField({
           placeholder={placeholder}
           value={inputValue}
           disabled={disabled}
-          className="min-h-12 pl-9"
+          className="pl-9"
           autoComplete="off"
           onChange={(e) => {
             onInputChange(e.target.value);

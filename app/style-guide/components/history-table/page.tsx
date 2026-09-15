@@ -90,13 +90,13 @@ export default function HistoryTableShowcasePage() {
       <div className="mx-auto max-w-5xl space-y-12 px-4 py-10 md:px-8">
         <ShowcaseHeader
           title="HistoryTable"
-          description="Tabela interativa do histórico de viagens com colunas organizadas, ação de ver detalhes em drawer, seleção de linha e empty state."
+          description="Lista de cards do histórico com busca client-side, detalhes em drawer, seleção e empty state."
         />
 
         <ShowcaseSection
           id="demo"
           title="Demo interativa"
-          description="Use o ícone de olho para abrir os detalhes no drawer. Clique em uma linha para selecionar. Use Limpar para forçar o empty state."
+          description="Busque por trecho ou combustível. Use o ícone de olho para abrir os detalhes. Clique em um card para selecionar. Use Limpar para forçar o empty state."
         >
           <HistoryTable
             items={items}
@@ -134,7 +134,7 @@ export default function HistoryTableShowcasePage() {
         <ShowcaseSection
           id="props"
           title="API"
-          description="Props da tabela de histórico."
+          description="Props da lista de histórico (cards + busca)."
         >
           <PropsTable
             rows={[
@@ -146,12 +146,12 @@ export default function HistoryTableShowcasePage() {
               {
                 name: "selectedId",
                 type: "string",
-                description: "Id da linha selecionada (estado visual).",
+                description: "Id do card selecionado (estado visual).",
               },
               {
                 name: "onSelect",
                 type: "(viagem: Viagem) => void",
-                description: "Torna as linhas clicáveis/selecionáveis.",
+                description: "Torna os cards clicáveis/selecionáveis.",
               },
               {
                 name: "onClearHistory",
@@ -181,30 +181,31 @@ export default function HistoryTableShowcasePage() {
         <ShowcaseSection
           id="a11y"
           title="Acessibilidade"
-          description="Navegação por teclado nas linhas e status do empty state."
+          description="Navegação por teclado nos cards, busca e status do empty state."
         >
           <Card>
             <CardContent className="space-y-2 pt-6 text-sm text-muted-foreground">
               <p>
                 Com <code className="font-mono text-foreground">onSelect</code>,
-                linhas recebem <code className="font-mono text-foreground">tabIndex=0</code>,{" "}
+                cards recebem <code className="font-mono text-foreground">tabIndex=0</code>,{" "}
                 <code className="font-mono text-foreground">role=&quot;button&quot;</code> e
                 respondem a Enter/Espaço.
               </p>
               <p>
-                Empty state usa <code className="font-mono text-foreground">role=&quot;status&quot;</code>{" "}
-                para anunciar a ausência de registros.
+                Empty state e busca sem resultados usam{" "}
+                <code className="font-mono text-foreground">role=&quot;status&quot;</code>{" "}
+                para anunciar o estado da lista.
               </p>
               <p>
                 Valores numéricos e datas usam tipografia mono para leitura
-                alinhada em dashboards.
+                alinhada.
               </p>
               <p>
                 O botão de ações (ícone de olho) usa{" "}
                 <code className="font-mono text-foreground">aria-label</code>{" "}
                 descritivo e{" "}
                 <code className="font-mono text-foreground">stopPropagation</code>{" "}
-                para não conflitar com a seleção de linha.
+                para não conflitar com a seleção do card.
               </p>
               <p>
                 O drawer de detalhes pode ser fechado pelo ícone X, pelo botão

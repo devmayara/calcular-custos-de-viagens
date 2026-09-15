@@ -21,6 +21,8 @@ export type CalculationResultCardProps = {
   quantidadePassageiros?: number;
   tipoCombustivel?: TipoCombustivel | string;
   tipoTrajeto?: TipoTrajeto | string;
+  /** When true, hide the OK status badge (e.g. nested in a detail drawer). */
+  hideStatusBadge?: boolean;
   className?: string;
 };
 
@@ -32,6 +34,7 @@ export function CalculationResultCard({
   quantidadePassageiros = 1,
   tipoCombustivel,
   tipoTrajeto,
+  hideStatusBadge = false,
   className,
 }: CalculationResultCardProps) {
   const combustivelLabel = labelCombustivel(tipoCombustivel);
@@ -63,46 +66,65 @@ export function CalculationResultCard({
     <Card className={cn(className)} aria-live="polite">
       <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1">
             <CardTitle>Resultado do cálculo</CardTitle>
             <CardDescription>
               Custo estimado com base nos dados informados.
             </CardDescription>
           </div>
-          <Badge variant="secondary">OK</Badge>
+          {!hideStatusBadge ? (
+            <Badge variant="secondary" className="shrink-0">
+              OK
+            </Badge>
+          ) : null}
         </div>
 
         {(trecho ||
           distanciaKm !== undefined ||
           combustivelLabel ||
           trajetoLabel) && (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 flex max-w-full flex-wrap gap-2">
             {trecho ? (
-              <Badge variant="outline" className="gap-1 font-normal">
-                <MapPin className="size-3.5" aria-hidden />
-                {trecho}
+              <Badge
+                variant="outline"
+                className="max-w-full gap-1 font-normal whitespace-normal"
+              >
+                <MapPin className="size-3.5 shrink-0" aria-hidden />
+                <span className="min-w-0 break-words">{trecho}</span>
               </Badge>
             ) : null}
             {distanciaKm !== undefined ? (
-              <Badge variant="outline" className="gap-1 font-mono font-normal">
-                <Fuel className="size-3.5" aria-hidden />
+              <Badge
+                variant="outline"
+                className="gap-1 font-mono font-normal whitespace-nowrap"
+              >
+                <Fuel className="size-3.5 shrink-0" aria-hidden />
                 {formatNumber(distanciaKm)} km
               </Badge>
             ) : null}
             {trajetoLabel ? (
-              <Badge variant="outline" className="gap-1 font-normal">
-                <ArrowRightLeft className="size-3.5" aria-hidden />
+              <Badge
+                variant="outline"
+                className="gap-1 font-normal whitespace-nowrap"
+              >
+                <ArrowRightLeft className="size-3.5 shrink-0" aria-hidden />
                 {trajetoLabel}
               </Badge>
             ) : null}
             {combustivelLabel ? (
-              <Badge variant="outline" className="gap-1 font-normal">
-                <Fuel className="size-3.5" aria-hidden />
+              <Badge
+                variant="outline"
+                className="gap-1 font-normal whitespace-nowrap"
+              >
+                <Fuel className="size-3.5 shrink-0" aria-hidden />
                 {combustivelLabel}
               </Badge>
             ) : null}
-            <Badge variant="outline" className="gap-1 font-normal">
-              <Users className="size-3.5" aria-hidden />
+            <Badge
+              variant="outline"
+              className="gap-1 font-normal whitespace-nowrap"
+            >
+              <Users className="size-3.5 shrink-0" aria-hidden />
               {quantidadePassageiros}{" "}
               {quantidadePassageiros === 1 ? "passageiro" : "passageiros"}
             </Badge>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Calculator, History } from "lucide-react";
@@ -8,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { name: "Calcular", href: "/", icon: Calculator },
-  { name: "Histórico de Viagens", href: "/historico", icon: History },
+  { name: "Calcular", href: "/calcular", icon: Calculator },
+  { name: "Histórico", href: "/historico", icon: History },
 ] as const;
 
 export function AppHeader() {
@@ -22,11 +23,16 @@ export function AppHeader() {
           href="/"
           className="flex min-w-0 items-center gap-2 text-foreground transition-opacity hover:opacity-80"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Calculator className="size-4" aria-hidden />
-          </span>
+          <Image
+            src="/brand/logo.png"
+            alt=""
+            width={32}
+            height={32}
+            className="size-8 shrink-0 rounded-lg object-contain"
+            priority
+          />
           <span className="font-heading truncate text-sm font-semibold tracking-tight sm:text-base">
-            Calcula Custo
+            NaGota
           </span>
         </Link>
 
@@ -36,10 +42,7 @@ export function AppHeader() {
             aria-label="Navegação principal"
           >
             {navItems.map(({ name, href, icon: Icon }) => {
-              const isActive =
-                href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(href);
+              const isActive = pathname.startsWith(href);
 
               return (
                 <Button

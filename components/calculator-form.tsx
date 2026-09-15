@@ -376,10 +376,6 @@ export function CalculatorForm({
     <Card className={cn(className)}>
       <CardHeader>
         <CardTitle>Calcular custo da viagem</CardTitle>
-        <CardDescription>
-          Origem, destino e combustível — a distância pode ser calculada pela
-          rota.
-        </CardDescription>
       </CardHeader>
 
       <form
@@ -404,7 +400,7 @@ export function CalculatorForm({
                 ) : (
                   <LocateFixed data-icon="inline-start" />
                 )}
-                Usar minha localização
+                Minha localização
               </Button>
             </div>
             <PlaceAutocompleteField

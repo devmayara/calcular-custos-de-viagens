@@ -1,7 +1,12 @@
-import { AlertCircle, Calculator, CheckCircle2, Info, Pencil } from "lucide-react";
+import {
+  AlertCircle,
+  Calculator,
+  CheckCircle2,
+  Info,
+  Pencil,
+} from "lucide-react";
 import { AppBottomNav } from "@/components/app-bottom-nav";
 import { AppHeader } from "@/components/app-header";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +22,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+const brandCore = [
+  { name: "deep", hex: "#073B1A", className: "bg-primary-800" },
+  { name: "lime", hex: "#76BB2A", className: "bg-secondary-500" },
+  { name: "mid", hex: "#4F7F45", className: "bg-[#4F7F45]" },
+  { name: "orange", hex: "#E8752E", className: "bg-brand-accent-500" },
+  { name: "offwhite", hex: "#F4F1E8", className: "bg-neutral-100" },
+  { name: "graphite", hex: "#20262E", className: "bg-neutral-900" },
+] as const;
+
 const primaryScale = [
   { name: "50", token: "--primary-50", className: "bg-primary-50" },
   { name: "100", token: "--primary-100", className: "bg-primary-100" },
@@ -28,6 +42,7 @@ const primaryScale = [
   { name: "700", token: "--primary-700", className: "bg-primary-700" },
   { name: "800", token: "--primary-800", className: "bg-primary-800" },
   { name: "900", token: "--primary-900", className: "bg-primary-900" },
+  { name: "950", token: "--primary-950", className: "bg-primary-950" },
 ] as const;
 
 const secondaryScale = [
@@ -41,9 +56,65 @@ const secondaryScale = [
   { name: "700", token: "--secondary-700", className: "bg-secondary-700" },
   { name: "800", token: "--secondary-800", className: "bg-secondary-800" },
   { name: "900", token: "--secondary-900", className: "bg-secondary-900" },
+  { name: "950", token: "--secondary-950", className: "bg-secondary-950" },
+] as const;
+
+const accentScale = [
+  { name: "50", token: "--brand-accent-50", className: "bg-brand-accent-50" },
+  {
+    name: "100",
+    token: "--brand-accent-100",
+    className: "bg-brand-accent-100",
+  },
+  {
+    name: "200",
+    token: "--brand-accent-200",
+    className: "bg-brand-accent-200",
+  },
+  {
+    name: "300",
+    token: "--brand-accent-300",
+    className: "bg-brand-accent-300",
+  },
+  {
+    name: "400",
+    token: "--brand-accent-400",
+    className: "bg-brand-accent-400",
+  },
+  {
+    name: "500",
+    token: "--brand-accent-500",
+    className: "bg-brand-accent-500",
+  },
+  {
+    name: "600",
+    token: "--brand-accent-600",
+    className: "bg-brand-accent-600",
+  },
+  {
+    name: "700",
+    token: "--brand-accent-700",
+    className: "bg-brand-accent-700",
+  },
+  {
+    name: "800",
+    token: "--brand-accent-800",
+    className: "bg-brand-accent-800",
+  },
+  {
+    name: "900",
+    token: "--brand-accent-900",
+    className: "bg-brand-accent-900",
+  },
+  {
+    name: "950",
+    token: "--brand-accent-950",
+    className: "bg-brand-accent-950",
+  },
 ] as const;
 
 const neutralScale = [
+  { name: "0", token: "--neutral-0", className: "bg-neutral-0" },
   { name: "50", token: "--neutral-50", className: "bg-neutral-50" },
   { name: "100", token: "--neutral-100", className: "bg-neutral-100" },
   { name: "200", token: "--neutral-200", className: "bg-neutral-200" },
@@ -54,6 +125,8 @@ const neutralScale = [
   { name: "700", token: "--neutral-700", className: "bg-neutral-700" },
   { name: "800", token: "--neutral-800", className: "bg-neutral-800" },
   { name: "900", token: "--neutral-900", className: "bg-neutral-900" },
+  { name: "950", token: "--neutral-950", className: "bg-neutral-950" },
+  { name: "1000", token: "--neutral-1000", className: "bg-neutral-1000" },
 ] as const;
 
 const semanticColors = [
@@ -68,6 +141,12 @@ const semanticColors = [
     bg: "bg-secondary",
     fg: "text-secondary-foreground",
     token: "--secondary",
+  },
+  {
+    name: "Accent",
+    bg: "bg-brand-accent",
+    fg: "text-neutral-900",
+    token: "--brand-accent",
   },
   {
     name: "Success",
@@ -99,68 +178,71 @@ const surfaceColors = [
   { name: "Background", className: "bg-background", token: "--background" },
   { name: "Card", className: "bg-card", token: "--card" },
   { name: "Muted", className: "bg-muted", token: "--muted" },
-  { name: "Accent", className: "bg-accent", token: "--accent" },
+  { name: "Accent UI", className: "bg-accent", token: "--accent" },
   { name: "Border", className: "bg-border", token: "--border" },
   { name: "Input", className: "bg-input", token: "--input" },
 ] as const;
 
 const typeScale = [
   {
-    label: "Display LG",
-    sample: "R$ 248,90",
-    className: "text-[40px] font-bold leading-[48px] tracking-[-0.02em]",
+    label: "Display XL",
+    sample: "Economia em movimento.",
+    className:
+      "font-heading text-[clamp(2.5rem,6vw,4.5rem)] font-bold leading-[0.98] tracking-[-0.035em]",
   },
   {
-    label: "Headline LG",
-    sample: "Custo da viagem",
-    className: "text-[28px] font-semibold leading-[34px]",
+    label: "H1",
+    sample: "Seu carro em boas mãos.",
+    className:
+      "font-heading text-4xl font-bold leading-[1.08] tracking-[-0.025em] sm:text-5xl",
   },
   {
-    label: "Title MD",
-    sample: "Dados do combustível",
-    className: "text-lg font-semibold leading-6",
+    label: "H2",
+    sample: "Controle dos seus gastos.",
+    className: "font-heading text-[40px] font-semibold leading-[1.12]",
   },
   {
-    label: "Body MD",
+    label: "H3",
+    sample: "Próxima revisão",
+    className: "font-heading text-[32px] font-semibold leading-[1.18]",
+  },
+  {
+    label: "Body",
     sample:
-      "Informe km, preço do litro e consumo médio para calcular o custo total.",
-    className: "text-base font-normal leading-6",
+      "Acompanhe custos, manutenção e documentos em um único lugar, com informações claras para decidir melhor.",
+    className: "font-sans text-base font-normal leading-[1.6]",
   },
   {
-    label: "Label Numeric",
-    sample: "12,5 km/L · R$ 5,89",
-    className: "font-mono text-sm font-medium leading-5 tracking-[0.02em]",
-  },
-  {
-    label: "Label SM",
-    sample: "Última troca de óleo",
-    className: "text-xs font-medium leading-4",
+    label: "Label",
+    sample: "Economizados este mês",
+    className:
+      "font-sans text-[13px] font-semibold leading-[1.25] tracking-[0.04em] uppercase",
   },
 ] as const;
 
 const radii = [
-  { name: "sm", className: "rounded-sm", token: "--radius-sm", value: "4px" },
-  { name: "md", className: "rounded-md", token: "--radius-md", value: "8px" },
-  { name: "lg", className: "rounded-lg", token: "--radius-lg", value: "12px" },
-  { name: "xl", className: "rounded-xl", token: "--radius-xl", value: "16px" },
+  { name: "XS", className: "rounded-sm", token: "radius.xs", value: "4px" },
+  { name: "SM", className: "rounded-md", token: "radius.sm", value: "8px" },
+  { name: "MD", className: "rounded-lg", token: "radius.md", value: "12px" },
+  { name: "LG", className: "rounded-xl", token: "radius.lg", value: "16px" },
   {
-    name: "2xl",
+    name: "XL",
     className: "rounded-2xl",
-    token: "--radius-2xl",
+    token: "radius.xl",
     value: "24px",
   },
   {
-    name: "full",
+    name: "Full",
     className: "rounded-full",
-    token: "--radius-full",
+    token: "radius.full",
     value: "9999px",
   },
 ] as const;
 
 const shadows = [
-  { name: "sm", className: "shadow-sm", token: "--shadow-sm" },
-  { name: "md", className: "shadow-md", token: "--shadow-md" },
-  { name: "lg", className: "shadow-lg", token: "--shadow-lg" },
+  { name: "Elevation 1", className: "shadow-sm", token: "--elevation-1" },
+  { name: "Elevation 2", className: "shadow-md", token: "--elevation-2" },
+  { name: "Elevation 3", className: "shadow-lg", token: "--elevation-3" },
 ] as const;
 
 function Section({
@@ -199,7 +281,7 @@ function ColorSwatch({
   textClassName?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg ring-1 ring-foreground/10">
+    <div className="overflow-hidden rounded-xl ring-1 ring-border">
       <div className={`h-16 ${className} ${textClassName ?? ""}`} />
       <div className="space-y-0.5 bg-card p-2">
         <p className="text-xs font-medium text-foreground">{name}</p>
@@ -212,20 +294,6 @@ function ColorSwatch({
 export default function StyleGuidePage() {
   return (
     <div className="min-h-screen">
-      {/* <div className="border-b border-border bg-muted/40 px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
-          <div>
-            <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-              Preview · App chrome
-            </p>
-            <p className="text-sm text-foreground">
-              Cabeçalho e navegação principal do aplicativo
-            </p>
-          </div>
-          <ThemeToggle />
-        </div>
-      </div> */}
-
       <div className="relative pb-20 md:pb-0">
         <AppHeader />
         <AppBottomNav />
@@ -233,23 +301,40 @@ export default function StyleGuidePage() {
 
       <div className="mx-auto max-w-5xl space-y-12 px-4 py-10 md:px-8">
         <header className="space-y-3">
-          <Badge variant="secondary">Foundation</Badge>
-          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+          <Badge variant="secondary">Foundation · NaGota v1.0</Badge>
+          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-5xl">
             Style Guide
           </h1>
           <p className="max-w-2xl text-muted-foreground">
             Design tokens e componentes base do{" "}
-            <span className="text-foreground">Calcula Custo de Viagem</span>,
-            inspirados em Kinetic Precision — confiável, eficiente e técnico.
+            <span className="text-foreground">NaGota</span> — Modern Utility +
+            Sustainable Mobility.
           </p>
         </header>
 
         <Section
-          id="colors"
-          title="Paleta de cores"
-          description="Cores semânticas e de superfície usadas pelos componentes shadcn/ui."
+          id="brand-core"
+          title="Paleta observada"
+          description="Seis tons-núcleo da identidade NaGota."
         >
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {brandCore.map((color) => (
+              <ColorSwatch
+                key={color.name}
+                name={color.name}
+                token={color.hex}
+                className={color.className}
+              />
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          id="colors"
+          title="Cores semânticas e superfícies"
+          description="Tokens usados pelos componentes shadcn/ui."
+        >
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {semanticColors.map((color) => (
               <ColorSwatch
                 key={color.token}
@@ -274,10 +359,10 @@ export default function StyleGuidePage() {
 
         <Section
           id="primary-scale"
-          title="Escala Primary (Forest Green)"
-          description="Verde da marca — CTAs, estados ativos e status positivos."
+          title="Primary · Verde profundo"
+          description="Âncora da marca — hierarquia, CTAs principais e superfícies fortes."
         >
-          <div className="grid grid-cols-5 gap-2 lg:grid-cols-10">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-11">
             {primaryScale.map((swatch) => (
               <ColorSwatch
                 key={swatch.token}
@@ -291,10 +376,10 @@ export default function StyleGuidePage() {
 
         <Section
           id="secondary-scale"
-          title="Escala Secondary (Gold)"
-          description="Âmbar para alertas de manutenção, combustível baixo e avisos."
+          title="Secondary · Verde-lima"
+          description="Sinal de performance, economia e estados positivos."
         >
-          <div className="grid grid-cols-5 gap-2 lg:grid-cols-10">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-11">
             {secondaryScale.map((swatch) => (
               <ColorSwatch
                 key={swatch.token}
@@ -307,11 +392,28 @@ export default function StyleGuidePage() {
         </Section>
 
         <Section
-          id="neutral-scale"
-          title="Escala Neutral (Deep Forest)"
-          description="Fundação estrutural — backgrounds, cards e divisores."
+          id="accent-scale"
+          title="Accent · Laranja"
+          description="Energia e CTA estratégico — no máximo 5–10% da composição."
         >
-          <div className="grid grid-cols-5 gap-2 lg:grid-cols-10">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-11">
+            {accentScale.map((swatch) => (
+              <ColorSwatch
+                key={swatch.token}
+                name={swatch.name}
+                token={swatch.token}
+                className={swatch.className}
+              />
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          id="neutral-scale"
+          title="Neutros"
+          description="Do off-white ao grafite — leitura limpa sem aspecto clínico."
+        >
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
             {neutralScale.map((swatch) => (
               <ColorSwatch
                 key={swatch.token}
@@ -326,20 +428,18 @@ export default function StyleGuidePage() {
         <Section
           id="typography"
           title="Tipografia"
-          description="Inter para interface; JetBrains Mono para valores numéricos."
+          description="Urbanist para voz da marca; Inter para leitura e UI."
         >
-          <Card>
+          <Card className="shadow-sm">
             <CardContent className="space-y-6 pt-6">
               {typeScale.map((item) => (
                 <div
                   key={item.label}
-                  className="grid gap-2 border-b border-border pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr]"
+                  className="grid gap-2 border-b border-border pb-4 last:border-0 last:pb-0 sm:grid-cols-[120px_1fr]"
                 >
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {item.label}
-                    </p>
-                  </div>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {item.label}
+                  </p>
                   <p className={`text-foreground ${item.className}`}>
                     {item.sample}
                   </p>
@@ -352,13 +452,13 @@ export default function StyleGuidePage() {
         <Section
           id="radius"
           title="Border radius"
-          description="Soft Modern — 8px em botões/inputs, 16px em cards."
+          description="Curvas moderadas: 12px em UI, até 24px em cards promocionais."
         >
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {radii.map((item) => (
               <div
                 key={item.name}
-                className="flex flex-col items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10"
+                className="flex flex-col items-center gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
               >
                 <div
                   className={`size-16 bg-primary ${item.className}`}
@@ -377,8 +477,8 @@ export default function StyleGuidePage() {
 
         <Section
           id="shadows"
-          title="Sombras"
-          description="Elevação ambientada — sombra preta em baixa opacidade sobre tons profundos."
+          title="Elevação"
+          description="Flat por padrão. Profundidade tingida de verde profundo quando ajuda."
         >
           <div className="grid gap-4 sm:grid-cols-3">
             {shadows.map((item) => (
@@ -386,7 +486,7 @@ export default function StyleGuidePage() {
                 key={item.name}
                 className={`rounded-xl bg-card p-6 ${item.className}`}
               >
-                <p className="text-sm font-medium">shadow-{item.name}</p>
+                <p className="font-heading text-sm font-semibold">{item.name}</p>
                 <p className="font-mono text-xs text-muted-foreground">
                   {item.token}
                 </p>
@@ -398,22 +498,25 @@ export default function StyleGuidePage() {
         <Section
           id="buttons"
           title="Botões"
-          description="Variantes e estados do Button shadcn/ui com os tokens aplicados."
+          description="Primary profundo para ação; secondary lima para ganho/positivo."
         >
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle>Variants</CardTitle>
               <CardDescription>
-                Primary para ações principais; outline para secundárias.
+                Laranja fica reservado a CTAs promocionais pontuais.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-3">
               <Button>Calcular Custo</Button>
-              <Button variant="secondary">Secundário</Button>
+              <Button variant="secondary">Economia</Button>
               <Button variant="outline">Ver Histórico</Button>
               <Button variant="ghost">Ghost</Button>
               <Button variant="destructive">Excluir</Button>
               <Button variant="link">Saiba mais</Button>
+              <Button className="bg-brand-accent text-neutral-900 hover:bg-brand-accent-600 hover:text-white">
+                CTA Accent
+              </Button>
               <Button>
                 <Pencil data-icon="inline-start" />
                 Editar
@@ -433,9 +536,9 @@ export default function StyleGuidePage() {
         <Section
           id="inputs"
           title="Inputs"
-          description="Campos de formulário com foco na primary e tipografia mono para números."
+          description="Campos com altura mínima de toque (min-h-12), focus ring em lima (#95CB43) e labels em tipografia label."
         >
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle>Dados da viagem</CardTitle>
               <CardDescription>
@@ -454,7 +557,7 @@ export default function StyleGuidePage() {
                   type="number"
                   inputMode="decimal"
                   placeholder="320"
-                  className="font-mono"
+                  className="font-heading tabular-nums"
                   defaultValue="320"
                 />
               </div>
@@ -465,7 +568,7 @@ export default function StyleGuidePage() {
                   type="number"
                   inputMode="decimal"
                   placeholder="5,89"
-                  className="font-mono"
+                  className="font-heading tabular-nums"
                   defaultValue="5.89"
                 />
               </div>
@@ -476,7 +579,7 @@ export default function StyleGuidePage() {
                   type="number"
                   inputMode="decimal"
                   placeholder="12,5"
-                  className="font-mono"
+                  className="font-heading tabular-nums"
                   defaultValue="12.5"
                 />
               </div>
@@ -486,10 +589,9 @@ export default function StyleGuidePage() {
                   id="search"
                   type="search"
                   placeholder="Buscar viagem..."
-                  disabled
                 />
                 <p className="text-xs text-muted-foreground">
-                  Estado disabled para referência visual.
+                  Mesma altura mínima usada na busca do histórico e na calculadora.
                 </p>
               </div>
             </CardContent>
@@ -504,10 +606,10 @@ export default function StyleGuidePage() {
         <Section
           id="cards-alerts"
           title="Cards, Badges & Alerts"
-          description="Containers e feedback semântico para saúde do veículo e custos."
+          description="Estado nunca é decoração — success, warning e error com função clara."
         >
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card>
+            <Card className="shadow-md">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
                   <CardTitle>Resumo da viagem</CardTitle>
@@ -516,12 +618,10 @@ export default function StyleGuidePage() {
                 <CardDescription>Último cálculo salvo</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="font-mono text-[40px] font-bold leading-none tracking-[-0.02em] text-primary">
+                <p className="font-heading text-[40px] font-bold leading-none tracking-[-0.03em] text-primary">
                   R$ 150,78
                 </p>
-                <p className="font-mono text-sm text-muted-foreground">
-                  R$ 0,47 / km
-                </p>
+                <p className="text-sm text-muted-foreground">R$ 0,47 / km</p>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">Gasolina</Badge>
                   <Badge variant="outline">320 km</Badge>
@@ -531,24 +631,28 @@ export default function StyleGuidePage() {
             </Card>
 
             <div className="space-y-3">
-              <Alert>
-                <Info />
-                <AlertTitle>Informação</AlertTitle>
-                <AlertDescription>
-                  Salve o cálculo para acompanhar o gasto mensal no histórico.
+              <Alert className="border-[#A9CBEA] bg-[#EEF5FC]">
+                <Info className="text-info" />
+                <AlertTitle className="text-[#1B4F7E]">Informação</AlertTitle>
+                <AlertDescription className="text-[#1B4F7E]/90">
+                  Nova recomendação para otimizar o consumo nesta rota.
                 </AlertDescription>
               </Alert>
-              <Alert className="border-warning/40 bg-warning/10 text-foreground">
-                <AlertCircle className="text-warning-foreground" />
-                <AlertTitle>Manutenção em breve</AlertTitle>
-                <AlertDescription>
+              <Alert className="border-[#F5C77A] bg-[#FFF7E6]">
+                <AlertCircle className="text-warning" />
+                <AlertTitle className="text-[#8A5200]">
+                  Manutenção em breve
+                </AlertTitle>
+                <AlertDescription className="text-[#8A5200]/90">
                   Faltam menos de 500 km para a próxima troca de óleo.
                 </AlertDescription>
               </Alert>
-              <Alert className="border-success/40 bg-success/10">
+              <Alert className="border-[#A5D6A7] bg-[#EDF7ED]">
                 <CheckCircle2 className="text-success" />
-                <AlertTitle>Sistema OK</AlertTitle>
-                <AlertDescription>
+                <AlertTitle className="text-[#1B5E20]">
+                  Economia confirmada
+                </AlertTitle>
+                <AlertDescription className="text-[#1B5E20]/90">
                   Consumo dentro da média cadastrada do veículo.
                 </AlertDescription>
               </Alert>
@@ -561,7 +665,7 @@ export default function StyleGuidePage() {
           title="Radio Group"
           description="Seleção de tipo de combustível no cadastro do veículo."
         >
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle>Tipo de combustível</CardTitle>
               <CardDescription>

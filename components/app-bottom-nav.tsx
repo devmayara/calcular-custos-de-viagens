@@ -6,7 +6,7 @@ import { Calculator, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { name: "Calcular", href: "/", icon: Calculator },
+  { name: "Calcular", href: "/calcular", icon: Calculator },
   { name: "Histórico", href: "/historico", icon: History },
 ] as const;
 
@@ -20,8 +20,7 @@ export function AppBottomNav() {
     >
       <ul className="mx-auto grid h-16 max-w-lg grid-cols-2">
         {navItems.map(({ name, href, icon: Icon }) => {
-          const isActive =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const isActive = pathname.startsWith(href);
 
           return (
             <li key={href} className="flex">

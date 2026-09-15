@@ -64,7 +64,7 @@ export function HistoryPage() {
         <HistoryTable
           items={items}
           emptyActionLabel="Fazer um cálculo"
-          onEmptyAction={() => router.push("/")}
+          onEmptyAction={() => router.push("/calcular")}
         />
       )}
     </div>

@@ -196,7 +196,7 @@ export default function CalculatorFormShowcasePage() {
               </p>
               <p>
                 Touch targets dos inputs e do CTA respeitam altura mínima de 48px
-                (design system Kinetic Precision).
+                (design system NaGota).
               </p>
             </CardContent>
           </Card>

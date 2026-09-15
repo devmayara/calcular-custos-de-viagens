@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { CalculatePage } from "@/components/pages/calculate-page";
+import { LandingPage } from "@/components/pages/landing-page";
 
 export const metadata: Metadata = {
-  title: "Calcular | Calcula Custo",
+  title: "NaGota — Custo de viagem na gota",
   description:
-    "Calcule o custo de combustível da sua viagem com base em km, preço do litro e consumo.",
+    "Calcule o custo de combustível das suas viagens, rateie por passageiro e acompanhe o histórico.",
 };
 
 export default function HomePage() {
-  return <CalculatePage />;
+  return <LandingPage />;
 }

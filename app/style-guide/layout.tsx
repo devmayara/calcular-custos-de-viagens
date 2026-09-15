@@ -21,7 +21,7 @@ export default function StyleGuideLayout({
             Design System
           </Link>
           <p className="mt-1 text-xs text-muted-foreground">
-            Kinetic Precision
+            NaGota · v1.0
           </p>
         </div>
 
